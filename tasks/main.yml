@@ -1,0 +1,39 @@
+---
+# tasks file for teleport-enroll
+- name: Get the Teleport version
+  ansible.builtin.uri:
+    url: "https://{{ teleport_domain }}/v1/webapi/automaticupgrades/channel/default/version"
+    return_content: yes
+  register: teleport_version_response
+
+- name: Extract the version number
+  ansible.builtin.set_fact:
+    teleport_version: "{{ teleport_version_response.content | regex_replace('v', '') }}"
+
+- name: Install Teleport
+  ansible.builtin.shell: curl https://goteleport.com/static/install.sh | bash -s {{ teleport_version }} {{ teleport_edition }}
+  args:
+    executable: /bin/bash
+
+- name: Extract node name
+  ansible.builtin.command: hostname
+  register: nodename_command
+
+- name: Set node name fact
+  ansible.builtin.set_fact:
+    get_nodename: "{{ nodename_command.stdout }}"
+
+- name: Render teleport.yaml template
+  ansible.builtin.template:
+    src: default_teleport.yaml.j2
+    dest: /etc/teleport.yaml
+    owner: "root"
+    group: "root"
+    mode: 0600
+
+- name: Ensure teleport started and enabled on boot
+  ansible.builtin.systemd:
+    name: "teleport"
+    state: "started"
+    daemon_reload: yes
+    enabled: yes

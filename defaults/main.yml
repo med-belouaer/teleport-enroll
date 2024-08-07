@@ -1,0 +1,13 @@
+---
+# defaults file for teleport-enroll
+teleport_domain: "smartek.teleport.sh"
+teleport_proxy_server: "smartek.teleport.sh:443" 
+teleport_version: "16.1.0"
+teleport_edition: "cloud"          # cloud / enterprise / oss
+teleport_invite_token: ""
+teleport_ca_pin: "sha256:114c98c5278a7d5fc5487f96c2c053502a2414e405bfdc610fb392de86cef779"
+backup_teleport_config: true
+teleport_config_template: "default_teleport.yaml.j2"
+teleport_ssh_labels:
+  - { k: "env", v: "production" }
+  - { k: "role", v: "web-server" }

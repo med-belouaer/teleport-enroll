@@ -1,0 +1,28 @@
+---
+version: v3
+teleport:
+  nodename: "{{ get_nodename }}"
+  auth_token: "{{ teleport_invite_token }}"
+  ca_pin: "{{ teleport_ca_pin }}"
+{% if teleport_proxy_server|string %}
+  proxy_server: {{ teleport_proxy_server }}
+{% endif %}
+  log:
+    output: stderr
+    severity: INFO
+    format:
+      output: text
+  diag_addr: ""
+ssh_service:
+  enabled: "yes"
+  labels:
+{% for ssh_label in teleport_ssh_labels %}
+    {{ ssh_label.k }}: {{ ssh_label.v }}
+{% endfor %}
+proxy_service:
+  enabled: "no"
+  https_keypairs: []
+  https_keypairs_reload_interval: 0s
+  acme: {}
+auth_service:
+  enabled: "no"
